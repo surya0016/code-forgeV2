@@ -1,0 +1,117 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Problem {
+  id              Int          @id @default(autoincrement())
+  title           String
+  description     String
+  difficulty      Difficulty
+  acceptanceRate  Float        @default(0.0)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  isSolved        Boolean      @default(false)
+  starterCode     String       @default("//Start your code here")
+  testCases       TestCase[]
+  submissions     Submission[]
+  tags            ProblemTag[]
+  discussions     Discussion[]
+  solutions       Solution[]
+  examples        Examples[]
+  constraints     Constraint[]
+}
+
+enum Difficulty {
+  Easy
+  Medium
+  Hard
+}
+
+model Examples {
+  id          Int     @id @default(autoincrement())
+  input       String
+  output      String
+  explanation String?
+  problem     Problem @relation(fields: [problemId], references: [id])
+  problemId   Int
+}
+
+model Constraint {
+  id          Int     @id @default(autoincrement())
+  value       String
+  problem     Problem @relation(fields: [problemId], references: [id])
+  problemId   Int
+}
+
+model TestCase {
+  id          Int     @id @default(autoincrement())
+  input       String
+  output      String
+  isHidden    Boolean @default(false)
+  problem     Problem @relation(fields: [problemId], references: [id])
+  problemId   Int
+}
+
+model Submission {
+  id          Int       @id @default(autoincrement())
+  code        String
+  language    String
+  status      SubmissionStatus
+  runtime     Int?
+  memory      Float?
+  createdAt   DateTime  @default(now())
+  problem     Problem   @relation(fields: [problemId], references: [id])
+  problemId   Int
+}
+
+enum SubmissionStatus {
+  Accepted
+  WrongAnswer
+  TimeLimitExceeded
+  RuntimeError
+  CompileError
+}
+
+model Tag {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  problems    ProblemTag[]
+}
+
+model ProblemTag {
+  problem     Problem @relation(fields: [problemId], references: [id])
+  problemId   Int
+  tag         Tag     @relation(fields: [tagId], references: [id])
+  tagId       Int
+
+  @@id([problemId, tagId])
+}
+
+model Discussion {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  upvotes     Int       @default(0)
+  isPinned    Boolean   @default(false)
+  problem     Problem   @relation(fields: [problemId], references: [id])
+  problemId   Int
+}
+
+model Solution {
+  id          Int       @id @default(autoincrement())
+  title       String
+  content     String
+  createdAt   DateTime  @default(now())
+  upvotes     Int       @default(0)
+  language    String?
+  problem     Problem   @relation(fields: [problemId], references: [id])
+  problemId   Int
+}
