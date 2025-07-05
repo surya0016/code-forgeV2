@@ -4,7 +4,6 @@ import { twMerge } from "tailwind-merge"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
- 
 
 export const problems = [
   {
@@ -18,18 +17,99 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def twoSum(nums, target):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    input_lines = sys.stdin.read().strip().split('\\n')
+    nums = list(map(int, input_lines[0].split()))
+    target = int(input_lines[1])
+    result = twoSum(nums, target)
+    print(' '.join(map(str, result)))
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your code here\n        return null;\n    }\n}",
+          code: `
+class Solution {
+    public int[] twoSum(int[] nums, int target) {
+        // Your code here
+        return null;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] numsStr = br.readLine().split(" ");
+        int[] nums = new int[numsStr.length];
+        for (int i = 0; i < numsStr.length; i++) {
+            nums[i] = Integer.parseInt(numsStr[i]);
+        }
+        int target = Integer.parseInt(br.readLine());
+        Solution sol = new Solution();
+        int[] result = sol.twoSum(nums, target);
+        System.out.println(result[0] + " " + result[1]);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+function twoSum(nums, target) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const input = fs.readFileSync(0, 'utf8').trim().split('\\n');
+const nums = input[0].split(' ').map(Number);
+const target = parseInt(input[1]);
+const result = twoSum(nums, target);
+console.log(result.join(' '));
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Your code here\n        return {};\n    }\n};",
+          code: `
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        // Your code here
+        return {};
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <vector>
+#include <sstream>
+using namespace std;
+
+int main() {
+    string line;
+    getline(cin, line);
+    istringstream iss(line);
+    vector<int> nums;
+    int num;
+    while (iss >> num) {
+        nums.push_back(num);
+    }
+    int target;
+    cin >> target;
+    
+    Solution sol;
+    vector<int> result = sol.twoSum(nums, target);
+    cout << result[0] << " " << result[1] << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -67,19 +147,229 @@ export const problems = [
       create: [
         {
           language: "PYTHON",
-          code: "class ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\ndef addTwoNumbers(l1, l2):\n    pass",
+          code: `
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def addTwoNumbers(l1, l2):
+    pass`.trim(),
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    input_lines = sys.stdin.read().strip().split('\\n')
+    l1_vals = list(map(int, input_lines[0].split()))
+    l2_vals = list(map(int, input_lines[1].split()))
+    
+    def create_linked_list(vals):
+        if not vals:
+            return None
+        head = ListNode(vals[0])
+        current = head
+        for val in vals[1:]:
+            current.next = ListNode(val)
+            current = current.next
+        return head
+    
+    def linked_list_to_array(head):
+        result = []
+        current = head
+        while current:
+            result.append(current.val)
+            current = current.next
+        return result
+    
+    l1 = create_linked_list(l1_vals)
+    l2 = create_linked_list(l2_vals)
+    result = addTwoNumbers(l1, l2)
+    output = linked_list_to_array(result)
+    print(' '.join(map(str, output)))
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "/**\n * Definition for singly-linked list.\n * public class ListNode {\n * int val;\n * ListNode next;\n * ListNode() {}\n * ListNode(int val) { this.val = val; }\n * ListNode(int val, ListNode next) { this.val = val; this.next = next; }\n * }\n */\nclass Solution {\n    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {\n        // Your code here\n        return null;\n    }\n}",
+          code: `
+class ListNode {
+    int val;
+    ListNode next;
+    ListNode() {}
+    ListNode(int val) { this.val = val; }
+    ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+}
+
+class Solution {
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        // Your code here
+        return null;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] l1Str = br.readLine().split(" ");
+        String[] l2Str = br.readLine().split(" ");
+        
+        ListNode l1 = createLinkedList(l1Str);
+        ListNode l2 = createLinkedList(l2Str);
+        
+        Solution sol = new Solution();
+        ListNode result = sol.addTwoNumbers(l1, l2);
+        printLinkedList(result);
+    }
+    
+    static ListNode createLinkedList(String[] vals) {
+        if (vals.length == 0) return null;
+        ListNode head = new ListNode(Integer.parseInt(vals[0]));
+        ListNode current = head;
+        for (int i = 1; i < vals.length; i++) {
+            current.next = new ListNode(Integer.parseInt(vals[i]));
+            current = current.next;
+        }
+        return head;
+    }
+    
+    static void printLinkedList(ListNode head) {
+        List<String> result = new ArrayList<>();
+        ListNode current = head;
+        while (current != null) {
+            result.add(String.valueOf(current.val));
+            current = current.next;
+        }
+        System.out.println(String.join(" ", result));
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n * this.val = (val===undefined ? 0 : val)\n * this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} l1\n * @param {ListNode} l2\n * @return {ListNode}\n */\nfunction addTwoNumbers(l1, l2) {\n    // Your code here\n}",
+          code: `
+function ListNode(val, next) {
+    this.val = (val===undefined ? 0 : val);
+    this.next = (next===undefined ? null : next);
+}
+
+/**
+ * @param {ListNode} l1
+ * @param {ListNode} l2
+ * @return {ListNode}
+ */
+function addTwoNumbers(l1, l2) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const input = fs.readFileSync(0, 'utf8').trim().split('\\n');
+const l1Vals = input[0].split(' ').map(Number);
+const l2Vals = input[1].split(' ').map(Number);
+
+function createLinkedList(vals) {
+    if (vals.length === 0) return null;
+    const head = new ListNode(vals[0]);
+    let current = head;
+    for (let i = 1; i < vals.length; i++) {
+        current.next = new ListNode(vals[i]);
+        current = current.next;
+    }
+    return head;
+}
+
+function linkedListToArray(head) {
+    const result = [];
+    let current = head;
+    while (current) {
+        result.push(current.val);
+        current = current.next;
+    }
+    return result;
+}
+
+const l1 = createLinkedList(l1Vals);
+const l2 = createLinkedList(l2Vals);
+const result = addTwoNumbers(l1, l2);
+const output = linkedListToArray(result);
+console.log(output.join(' '));
+          `.trim()
         },
         {
           language: "CPP",
-          code: "/**\n * Definition for singly-linked list.\n * struct ListNode {\n * int val;\n * ListNode *next;\n * ListNode() : val(0), next(nullptr) {}\n * ListNode(int x) : val(x), next(nullptr) {}\n * ListNode(int x, ListNode *next) : val(x), next(next) {}\n * };\n */\nclass Solution {\npublic:\n    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {\n        // Your code here\n        return nullptr;\n    }\n};",
+          code: `
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        // Your code here
+        return nullptr;
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <vector>
+#include <sstream>
+using namespace std;
+
+ListNode* createLinkedList(vector<int>& vals) {
+    if (vals.empty()) return nullptr;
+    ListNode* head = new ListNode(vals[0]);
+    ListNode* current = head;
+    for (int i = 1; i < vals.size(); i++) {
+        current->next = new ListNode(vals[i]);
+        current = current->next;
+    }
+    return head;
+}
+
+void printLinkedList(ListNode* head) {
+    vector<int> result;
+    ListNode* current = head;
+    while (current) {
+        result.push_back(current->val);
+        current = current->next;
+    }
+    for (int i = 0; i < result.size(); i++) {
+        if (i > 0) cout << " ";
+        cout << result[i];
+    }
+    cout << endl;
+}
+
+int main() {
+    string line;
+    getline(cin, line);
+    istringstream iss1(line);
+    vector<int> l1Vals;
+    int num;
+    while (iss1 >> num) {
+        l1Vals.push_back(num);
+    }
+    
+    getline(cin, line);
+    istringstream iss2(line);
+    vector<int> l2Vals;
+    while (iss2 >> num) {
+        l2Vals.push_back(num);
+    }
+    
+    ListNode* l1 = createLinkedList(l1Vals);
+    ListNode* l2 = createLinkedList(l2Vals);
+    
+    Solution sol;
+    ListNode* result = sol.addTwoNumbers(l1, l2);
+    printLinkedList(result);
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -117,18 +407,79 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def lengthOfLongestSubstring(s):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    s = sys.stdin.read().strip()
+    result = lengthOfLongestSubstring(s)
+    print(result)
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        // Your code here\n        return 0;\n    }\n}",
+          code: `
+class Solution {
+    public int lengthOfLongestSubstring(String s) {
+        // Your code here
+        return 0;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+        Solution sol = new Solution();
+        int result = sol.lengthOfLongestSubstring(s);
+        System.out.println(result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {string} s\n * @return {number}\n */\nfunction lengthOfLongestSubstring(s) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {string} s
+ * @return {number}
+ */
+function lengthOfLongestSubstring(s) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const s = fs.readFileSync(0, 'utf8').trim();
+const result = lengthOfLongestSubstring(s);
+console.log(result);
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        // Your code here\n        return 0;\n    }\n};",
+          code: `
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        // Your code here
+        return 0;
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s;
+    getline(cin, s);
+    Solution sol;
+    int result = sol.lengthOfLongestSubstring(s);
+    cout << result << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -165,18 +516,112 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def findMedianSortedArrays(nums1, nums2):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    input_lines = sys.stdin.read().strip().split('\\n')
+    nums1 = list(map(int, input_lines[0].split()))
+    nums2 = list(map(int, input_lines[1].split()))
+    result = findMedianSortedArrays(nums1, nums2)
+    print(f"{result:.5f}")
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public double findMedianSortedArrays(int[] nums1, int[] nums2) {\n        // Your code here\n        return 0.0;\n    }\n}",
+          code: `
+class Solution {
+    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        // Your code here
+        return 0.0;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] nums1Str = br.readLine().split(" ");
+        String[] nums2Str = br.readLine().split(" ");
+        
+        int[] nums1 = new int[nums1Str.length];
+        for (int i = 0; i < nums1Str.length; i++) {
+            nums1[i] = Integer.parseInt(nums1Str[i]);
+        }
+        
+        int[] nums2 = new int[nums2Str.length];
+        for (int i = 0; i < nums2Str.length; i++) {
+            nums2[i] = Integer.parseInt(nums2Str[i]);
+        }
+        
+        Solution sol = new Solution();
+        double result = sol.findMedianSortedArrays(nums1, nums2);
+        System.out.printf("%.5f%n", result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nfunction findMedianSortedArrays(nums1, nums2) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number}
+ */
+function findMedianSortedArrays(nums1, nums2) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const input = fs.readFileSync(0, 'utf8').trim().split('\\n');
+const nums1 = input[0].split(' ').map(Number);
+const nums2 = input[1].split(' ').map(Number);
+const result = findMedianSortedArrays(nums1, nums2);
+console.log(result.toFixed(5));
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n        // Your code here\n        return 0.0;\n    }\n};",
+          code: `
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        // Your code here
+        return 0.0;
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+int main() {
+    string line;
+    getline(cin, line);
+    istringstream iss1(line);
+    vector<int> nums1;
+    int num;
+    while (iss1 >> num) {
+        nums1.push_back(num);
+    }
+    
+    getline(cin, line);
+    istringstream iss2(line);
+    vector<int> nums2;
+    while (iss2 >> num) {
+        nums2.push_back(num);
+    }
+    
+    Solution sol;
+    double result = sol.findMedianSortedArrays(nums1, nums2);
+    cout << fixed << setprecision(5) << result << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -217,18 +662,79 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def longestPalindrome(s):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    s = sys.stdin.read().strip()
+    result = longestPalindrome(s)
+    print(result)
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public String longestPalindrome(String s) {\n        // Your code here\n        return \"\";\n    }\n}",
+          code: `
+class Solution {
+    public String longestPalindrome(String s) {
+        // Your code here
+        return "";
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+        Solution sol = new Solution();
+        String result = sol.longestPalindrome(s);
+        System.out.println(result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {string} s\n * @return {string}\n */\nfunction longestPalindrome(s) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {string} s
+ * @return {string}
+ */
+function longestPalindrome(s) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const s = fs.readFileSync(0, 'utf8').trim();
+const result = longestPalindrome(s);
+console.log(result);
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    string longestPalindrome(string s) {\n        // Your code here\n        return \"\";\n    }\n};",
+          code: `
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        // Your code here
+        return "";
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s;
+    getline(cin, s);
+    Solution sol;
+    string result = sol.longestPalindrome(s);
+    cout << result << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -265,18 +771,78 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def reverse(x):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    x = int(sys.stdin.read().strip())
+    result = reverse(x)
+    print(result)
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public int reverse(int x) {\n        // Your code here\n        return 0;\n    }\n}",
+          code: `
+class Solution {
+    public int reverse(int x) {
+        // Your code here
+        return 0;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int x = Integer.parseInt(br.readLine());
+        Solution sol = new Solution();
+        int result = sol.reverse(x);
+        System.out.println(result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {number} x\n * @return {number}\n */\nfunction reverse(x) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {number} x
+ * @return {number}
+ */
+function reverse(x) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const x = parseInt(fs.readFileSync(0, 'utf8').trim());
+const result = reverse(x);
+console.log(result);
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    int reverse(int x) {\n        // Your code here\n        return 0;\n    }\n};",
+          code: `
+class Solution {
+public:
+    int reverse(int x) {
+        // Your code here
+        return 0;
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+using namespace std;
+
+int main() {
+    int x;
+    cin >> x;
+    Solution sol;
+    int result = sol.reverse(x);
+    cout << result << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -300,7 +866,7 @@ export const problems = [
       { input: "-123", output: "-321", isHidden: false },
       { input: "120", output: "21", isHidden: false },
       { input: "0", output: "0", isHidden: false },
-      { input: "1534236469", output: "0", isHidden: true }, // Example of overflow
+      { input: "1534236469", output: "0", isHidden: true },
     ],
     tags: ["Math"],
   },
@@ -315,18 +881,78 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def isPalindrome(x):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    x = int(sys.stdin.read().strip())
+    result = isPalindrome(x)
+    print(str(result).lower())
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public boolean isPalindrome(int x) {\n        // Your code here\n        return false;\n    }\n}",
+          code: `
+class Solution {
+    public boolean isPalindrome(int x) {
+        // Your code here
+        return false;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int x = Integer.parseInt(br.readLine());
+        Solution sol = new Solution();
+        boolean result = sol.isPalindrome(x);
+        System.out.println(result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {number} x\n * @return {boolean}\n */\nfunction isPalindrome(x) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {number} x
+ * @return {boolean}
+ */
+function isPalindrome(x) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const x = parseInt(fs.readFileSync(0, 'utf8').trim());
+const result = isPalindrome(x);
+console.log(result);
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    bool isPalindrome(int x) {\n        // Your code here\n        return false;\n    }\n};",
+          code: `
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        // Your code here
+        return false;
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+using namespace std;
+
+int main() {
+    int x;
+    cin >> x;
+    Solution sol;
+    bool result = sol.isPalindrome(x);
+    cout << (result ? "true" : "false") << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -364,18 +990,79 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def romanToInt(s):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    s = sys.stdin.read().strip()
+    result = romanToInt(s)
+    print(result)
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public int romanToInt(String s) {\n        // Your code here\n        return 0;\n    }\n}",
+          code: `
+class Solution {
+    public int romanToInt(String s) {
+        // Your code here
+        return 0;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+        Solution sol = new Solution();
+        int result = sol.romanToInt(s);
+        System.out.println(result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {string} s\n * @return {number}\n */\nfunction romanToInt(s) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {string} s
+ * @return {number}
+ */
+function romanToInt(s) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const s = fs.readFileSync(0, 'utf8').trim();
+const result = romanToInt(s);
+console.log(result);
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    int romanToInt(string s) {\n        // Your code here\n        return 0;\n    }\n};",
+          code: `
+class Solution {
+public:
+    int romanToInt(string s) {
+        // Your code here
+        return 0;
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s;
+    cin >> s;
+    Solution sol;
+    int result = sol.romanToInt(s);
+    cout << result << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -419,18 +1106,88 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def longestCommonPrefix(strs):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    strs = sys.stdin.read().strip().split()
+    result = longestCommonPrefix(strs)
+    print(result)
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public String longestCommonPrefix(String[] strs) {\n        // Your code here\n        return \"\";\n    }\n}",
+          code: `
+class Solution {
+    public String longestCommonPrefix(String[] strs) {
+        // Your code here
+        return "";
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] strs = br.readLine().split(" ");
+        Solution sol = new Solution();
+        String result = sol.longestCommonPrefix(strs);
+        System.out.println(result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {string[]} strs\n * @return {string}\n */\nfunction longestCommonPrefix(strs) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {string[]} strs
+ * @return {string}
+ */
+function longestCommonPrefix(strs) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const strs = fs.readFileSync(0, 'utf8').trim().split(' ');
+const result = longestCommonPrefix(strs);
+console.log(result);
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    string longestCommonPrefix(vector<string>& strs) {\n        // Your code here\n        return \"\";\n    }\n};",
+          code: `
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        // Your code here
+        return "";
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+using namespace std;
+
+int main() {
+    string line;
+    getline(cin, line);
+    istringstream iss(line);
+    vector<string> strs;
+    string str;
+    while (iss >> str) {
+        strs.push_back(str);
+    }
+    
+    Solution sol;
+    string result = sol.longestCommonPrefix(strs);
+    cout << result << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },
@@ -474,18 +1231,79 @@ export const problems = [
         {
           language: "PYTHON",
           code: "def isValid(s):\n    pass",
+          wrapper: `
+if __name__ == "__main__":
+    import sys
+    s = sys.stdin.read().strip()
+    result = isValid(s)
+    print(str(result).lower())
+          `.trim()
         },
         {
           language: "JAVA",
-          code: "class Solution {\n    public boolean isValid(String s) {\n        // Your code here\n        return false;\n    }\n}",
+          code: `
+class Solution {
+    public boolean isValid(String s) {
+        // Your code here
+        return false;
+    }
+}`.trim(),
+          wrapper: `
+import java.util.*;
+import java.io.*;
+
+class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine();
+        Solution sol = new Solution();
+        boolean result = sol.isValid(s);
+        System.out.println(result);
+    }
+}
+`.trim()
         },
         {
           language: "JAVASCRIPT",
-          code: "/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isValid(s) {\n    // Your code here\n}",
+          code: `
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+function isValid(s) {
+    // Your code here
+}`.trim(),
+          wrapper: `
+const fs = require('fs');
+const s = fs.readFileSync(0, 'utf8').trim();
+const result = isValid(s);
+console.log(result);
+          `.trim()
         },
         {
           language: "CPP",
-          code: "class Solution {\npublic:\n    bool isValid(string s) {\n        // Your code here\n        return false;\n    }\n};",
+          code: `
+class Solution {
+public:
+    bool isValid(string s) {
+        // Your code here
+        return false;
+    }
+};`.trim(),
+          wrapper: `
+#include <iostream>
+#include <string>
+using namespace std;
+
+int main() {
+    string s;
+    cin >> s;
+    Solution sol;
+    bool result = sol.isValid(s);
+    cout << (result ? "true" : "false") << endl;
+    return 0;
+}
+`.trim()
         },
       ],
     },

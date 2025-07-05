@@ -2,20 +2,35 @@ import { PrismaClient } from '@prisma/client'
 import { problems } from './utils'
 const prisma = new PrismaClient()
 
+async function safeDeleteMany(model: any, modelName: string) {
+  try {
+    await model.deleteMany()
+    console.log(`✅ Cleared ${modelName}`)
+  } catch (error: any) {
+    if (error.code === 'P2021') {
+      console.log(`⚠️  ${modelName} table doesn't exist, skipping...`)
+    } else {
+      throw error
+    }
+  }
+}
+
 async function main() {
   // Delete related records first to avoid foreign key constraint violations
   console.log('🗑️  Clearing existing data...')
   
-  await prisma.starterCode.deleteMany()
-  await prisma.problemTag.deleteMany()
-  await prisma.submission.deleteMany()
-  await prisma.discussion.deleteMany()
-  await prisma.solution.deleteMany()
-  await prisma.testCase.deleteMany()
-  await prisma.examples.deleteMany()
-  await prisma.constraint.deleteMany()
-  await prisma.problem.deleteMany()
-  await prisma.tag.deleteMany()
+  // Clear data in proper order (child to parent relationships)
+  await safeDeleteMany(prisma.starterCode, 'StarterCode')
+  await safeDeleteMany(prisma.problemTag, 'ProblemTag')
+  await safeDeleteMany(prisma.submission, 'Submission')
+  // await safeDeleteMany(prisma.reply, 'Reply') // Comment out if Reply model doesn't exist
+  await safeDeleteMany(prisma.discussion, 'Discussion')
+  await safeDeleteMany(prisma.solution, 'Solution')
+  await safeDeleteMany(prisma.testCase, 'TestCase')
+  await safeDeleteMany(prisma.examples, 'Examples') // Use 'examples' not 'example'
+  await safeDeleteMany(prisma.constraint, 'Constraint')
+  await safeDeleteMany(prisma.problem, 'Problem')
+  await safeDeleteMany(prisma.tag, 'Tag')
 
   console.log('✅ Cleared existing data')
 
@@ -43,11 +58,13 @@ async function main() {
   console.log('📝 Creating problems...')
   for (const problem of problems) {
     console.log(`Creating problem: ${problem.title}`)
+    console.log(`Slug: ${problem.slug}`)
     console.log(`Tags for this problem:`, problem.tags)
     
     const created = await prisma.problem.create({
       data: {
         title: problem.title,
+        slug: problem.slug, // Add slug as it is required by the schema
         description: problem.description,
         difficulty: problem.difficulty as any,
         acceptanceRate: problem.acceptanceRate,
@@ -55,7 +72,7 @@ async function main() {
           create: problem.examples.map(e => ({
             input: e.input,
             output: e.output,
-            explanation: e.explanation,
+            explanation: e.explanation || null,
           })),
         },
         constraints: {
@@ -74,6 +91,7 @@ async function main() {
           create: problem.starterCode.create.map(sc => ({
             language: sc.language as any,
             code: sc.code,
+            wrapper: sc.wrapper, // Comment out if wrapper field doesn't exist yet
           })),
         },
         tags: {
@@ -87,9 +105,26 @@ async function main() {
     })
 
     console.log(`✔ Created problem: ${created.title} with ${problem.starterCode.create.length} starter codes`)
+    console.log(`  - Starter codes created for each language`)
   }
   
   console.log('🎉 Seeding completed successfully!')
+  
+  // Show summary
+  const problemCount = await prisma.problem.count()
+  const starterCodeCount = await prisma.starterCode.count()
+  const tagCount = await prisma.tag.count()
+  const testCaseCount = await prisma.testCase.count()
+  const exampleCount = await prisma.examples.count() // Use 'examples' not 'example'
+  const constraintCount = await prisma.constraint.count()
+  
+  console.log('\n📊 Database Summary:')
+  console.log(`- Problems: ${problemCount}`)
+  console.log(`- Starter Codes: ${starterCodeCount}`)
+  console.log(`- Tags: ${tagCount}`)
+  console.log(`- Test Cases: ${testCaseCount}`)
+  console.log(`- Examples: ${exampleCount}`)
+  console.log(`- Constraints: ${constraintCount}`)
 }
 
 main()

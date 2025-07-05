@@ -1,34 +1,46 @@
 import { NextResponse } from 'next/server'
-
-type TestCase = {
-  input: string
-  expectedOutput: string
-}
+import { problems } from '@/lib/utils'
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { language, version, code, testCases } = body
+    const { language, code, testCases, problemSlug } = body as {
+      language: keyof typeof languageConfig,
+      code: string,
+      testCases: Array<{ input: string, expectedOutput: string }>,
+      problemSlug: string
+    }
 
-    // Add validation
-    if (!language || !code || !testCases || !Array.isArray(testCases)) {
+    if (!language || !code || !testCases || !Array.isArray(testCases) || !problemSlug) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Map language names to Piston API format with specific versions
-    const languageConfig: Record<string, { language: string; version: string }> = {
-      python3: { language: 'python', version: '3.10.0' },
-      javascript: { language: 'javascript', version: '18.15.0' },
-      cpp: { language: 'cpp', version: '10.2.0' },
-      java: { language: 'java', version: '15.0.2' },
+    // Find the problem and get the wrapper
+    const problem = problems.find(p => p.slug === problemSlug)
+    if (!problem) {
+      return NextResponse.json({ error: 'Problem not found' }, { status: 404 })
     }
 
-    const config = languageConfig[language] || { language, version: version || '3.10.0' }
+    const starterCode = problem.starterCode.create.find(sc => sc.language === language)
+    if (!starterCode?.wrapper) {
+      return NextResponse.json({ error: 'Wrapper not found for this language' }, { status: 404 })
+    }
 
+    const languageConfig = {
+      PYTHON: { language: 'python', version: '3.10.0' },
+      JAVASCRIPT: { language: 'javascript', version: '18.15.0' },
+      CPP: { language: 'cpp', version: '10.2.0' },
+      JAVA: { language: 'java', version: '15.0.2' },
+    }
+
+    const config = languageConfig[language]
     const results = []
 
-    for (const testCase of testCases as TestCase[]) {
+    for (const testCase of testCases) {
       try {
+        // Combine user code with wrapper
+        const fullCode = code + '\n' + starterCode.wrapper
+
         const pistonRequest = {
           language: config.language,
           version: config.version,
@@ -36,12 +48,10 @@ export async function POST(req: Request) {
           files: [
             {
               name: `main.${getExtension(language)}`,
-              content: code,
+              content: fullCode,
             },
           ],
         }
-        
-        console.log('Sending to Piston API:', pistonRequest)
 
         const response = await fetch('https://emkc.org/api/v2/piston/execute', {
           method: 'POST',
@@ -49,16 +59,7 @@ export async function POST(req: Request) {
           body: JSON.stringify(pistonRequest),
         })
 
-        if (!response.ok) {
-          const errorText = await response.text()
-          console.error('Piston API error:', response.status, response.statusText)
-          console.error('Error response:', errorText)
-          throw new Error(`Piston API returned ${response.status}: ${errorText}`)
-        }
-
         const data = await response.json()
-        console.log('Piston API response:', data)
-        
         const actual = (data.run?.output || '').trim()
         const expected = testCase.expectedOutput.trim()
 
@@ -68,20 +69,54 @@ export async function POST(req: Request) {
           actual,
           passed: actual === expected,
           stderr: data.run?.stderr || null,
+          runtime: data.run?.runtime ? Math.round(data.run.runtime) : null,
+          memory: data.run?.memory ? Math.round(data.run.memory / 1024) : null,
+          exitCode: data.run?.code || null,
         })
-      } catch (fetchError) {
-        console.error('Error executing test case:', fetchError)
+      } catch (error) {
+        console.error('Error executing test case:', error)
         results.push({
           input: testCase.input,
           expected: testCase.expectedOutput,
           actual: '',
           passed: false,
           stderr: 'Execution failed',
+          runtime: null,
+          memory: null,
+          exitCode: null,
         })
       }
     }
 
-    return NextResponse.json({ results })
+    // Calculate summary statistics
+    const totalRuntime = results.reduce((sum, result) => sum + (result.runtime || 0), 0)
+    const maxMemory = Math.max(...results.map(result => result.memory || 0))
+    const passedTests = results.filter(result => result.passed).length
+
+    console.log(
+      {
+        results,
+        summary: {
+          totalTests: results.length,
+          passedTests,
+          failedTests: results.length - passedTests,
+          totalRuntime,
+          maxMemory,
+          averageRuntime: results.length > 0 ? Math.round(totalRuntime / results.length) : 0,
+        }
+      })
+
+    return NextResponse.json({ 
+      results,
+      summary: {
+        totalTests: results.length,
+        passedTests,
+        failedTests: results.length - passedTests,
+        totalRuntime,
+        maxMemory,
+        averageRuntime: results.length > 0 ? Math.round(totalRuntime / results.length) : 0,
+      }
+    })
   } catch (err) {
     console.error('API Route Error:', err)
     return NextResponse.json({ 
@@ -91,13 +126,12 @@ export async function POST(req: Request) {
   }
 }
 
-function getExtension(language: string) {
-  const extMap: Record<string, string> = {
-    python3: 'py',
-    python: 'py',
-    javascript: 'js',
-    cpp: 'cpp',
-    java: 'java',
+function getExtension(language: 'PYTHON' | 'JAVASCRIPT' | 'CPP' | 'JAVA'): string {
+  const extMap: Record<'PYTHON' | 'JAVASCRIPT' | 'CPP' | 'JAVA', string> = {
+    PYTHON: 'py',
+    JAVASCRIPT: 'js',
+    CPP: 'cpp',
+    JAVA: 'java',
   }
   return extMap[language] || 'txt'
 }

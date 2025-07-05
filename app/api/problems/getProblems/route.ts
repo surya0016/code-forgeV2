@@ -4,14 +4,25 @@ import { NextResponse } from "next/server";
 export async function GET(){
   try {
     const problems = await prisma.problem.findMany({
-      include:{
+      include: {
         tags: {
-          include:{
+          include: {
             tag: true
           }
-        }
-      }
-    }) 
+        },
+        constraints: true,
+        examples: true,
+        testCases: true,
+        starterCodes: true,
+        submissions: true,
+        discussions: true,
+        solutions: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 10,
+    });
 
     return NextResponse.json({
       problems

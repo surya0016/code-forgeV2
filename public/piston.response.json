@@ -1,0 +1,22 @@
+{
+  "language": "python",
+  "version": "3.10.0",
+  "run": {
+    "stdout": "Hello World\n",
+    "stderr": "",
+    "code": 0,
+    "signal": null,
+    "runtime": 23.456,     
+    "memory": 2048000,     
+    "output": "Hello World\n"
+  },
+  "compile": {
+    "stdout": "",
+    "stderr": "",
+    "code": 0,
+    "signal": null,
+    "runtime": 0,
+    "memory": 0,
+    "output": ""
+  }
+}
