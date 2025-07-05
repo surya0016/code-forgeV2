@@ -135,7 +135,7 @@ export function ProblemsContent() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredProblems.map((problem) => (
+                {filteredProblems.map((problem, index) => (
                   <TableRow key={problem.id} className="hover:bg-muted/50">
                     <TableCell>{getStatusIcon(problem.isSolved)}</TableCell>
                     <TableCell>
@@ -144,7 +144,7 @@ export function ProblemsContent() {
                           href={`/problems/${problem.id}`}
                           className="font-medium hover:text-blue-600 transition-colors"
                         >
-                          {problem.id}. {problem.title}
+                          {index+1}. {problem.title}
                         </Link>
                       </div>
                     </TableCell>

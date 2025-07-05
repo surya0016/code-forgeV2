@@ -6,6 +6,7 @@ async function main() {
   // Delete related records first to avoid foreign key constraint violations
   console.log('🗑️  Clearing existing data...')
   
+  await prisma.starterCode.deleteMany()
   await prisma.problemTag.deleteMany()
   await prisma.submission.deleteMany()
   await prisma.discussion.deleteMany()
@@ -38,7 +39,7 @@ async function main() {
 
   console.log(`✅ Created ${createdTags.length} tags: ${allTagNames.join(', ')}`)
 
-  // Create problems
+  // Create problems with starter codes
   console.log('📝 Creating problems...')
   for (const problem of problems) {
     console.log(`Creating problem: ${problem.title}`)
@@ -50,7 +51,6 @@ async function main() {
         description: problem.description,
         difficulty: problem.difficulty as any,
         acceptanceRate: problem.acceptanceRate,
-        starterCode: problem.starterCode,
         examples: {
           create: problem.examples.map(e => ({
             input: e.input,
@@ -70,6 +70,12 @@ async function main() {
             isHidden: tc.isHidden,
           })),
         },
+        starterCodes: {
+          create: problem.starterCode.create.map(sc => ({
+            language: sc.language as any,
+            code: sc.code,
+          })),
+        },
         tags: {
           create: problem.tags ? problem.tags.map(tagName => ({
             tag: {
@@ -80,7 +86,7 @@ async function main() {
       },
     })
 
-    console.log(`✔ Created problem: ${created.title}`)
+    console.log(`✔ Created problem: ${created.title} with ${problem.starterCode.create.length} starter codes`)
   }
   
   console.log('🎉 Seeding completed successfully!')

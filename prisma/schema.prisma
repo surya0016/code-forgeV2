@@ -16,7 +16,7 @@ model Problem {
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
   isSolved        Boolean      @default(false)
-  starterCode     String       @default("//Start your code here")
+  starterCodes    StarterCode[]       
   testCases       TestCase[]
   submissions     Submission[]
   tags            ProblemTag[]
@@ -24,6 +24,26 @@ model Problem {
   solutions       Solution[]
   examples        Examples[]
   constraints     Constraint[]
+  
+}
+
+model StarterCode {
+  id              Int           @id @default(autoincrement())
+  language        Language      
+  code            String        @default("//Start your code here")
+  problem         Problem       @relation(fields: [problemId], references: [id])
+  problemId       Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@unique([problemId, language])
+}
+
+enum Language {
+  PYTHON
+  JAVA
+  JAVASCRIPT
+  CPP
 }
 
 enum Difficulty {

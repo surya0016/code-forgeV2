@@ -13,7 +13,26 @@ export const problems = [
     description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.`,
     difficulty: "Easy",
     acceptanceRate: 49.2,
-    starterCode: "def twoSum(nums, target):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def twoSum(nums, target):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        // Your code here\n        return null;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number[]}\n */\nfunction twoSum(nums, target) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        // Your code here\n        return {};\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: "nums = [2,7,11,15], target = 9",
@@ -44,7 +63,26 @@ export const problems = [
     description: `You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.`,
     difficulty: "Medium",
     acceptanceRate: 41.5,
-    starterCode: "class ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\ndef addTwoNumbers(l1, l2):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "class ListNode:\n    def __init__(self, val=0, next=None):\n        self.val = val\n        self.next = next\ndef addTwoNumbers(l1, l2):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "/**\n * Definition for singly-linked list.\n * public class ListNode {\n * int val;\n * ListNode next;\n * ListNode() {}\n * ListNode(int val) { this.val = val; }\n * ListNode(int val, ListNode next) { this.val = val; this.next = next; }\n * }\n */\nclass Solution {\n    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {\n        // Your code here\n        return null;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * Definition for singly-linked list.\n * function ListNode(val, next) {\n * this.val = (val===undefined ? 0 : val)\n * this.next = (next===undefined ? null : next)\n * }\n */\n/**\n * @param {ListNode} l1\n * @param {ListNode} l2\n * @return {ListNode}\n */\nfunction addTwoNumbers(l1, l2) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "/**\n * Definition for singly-linked list.\n * struct ListNode {\n * int val;\n * ListNode *next;\n * ListNode() : val(0), next(nullptr) {}\n * ListNode(int x) : val(x), next(nullptr) {}\n * ListNode(int x, ListNode *next) : val(x), next(next) {}\n * };\n */\nclass Solution {\npublic:\n    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {\n        // Your code here\n        return nullptr;\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: "l1 = [2,4,3], l2 = [5,6,4]",
@@ -74,7 +112,26 @@ export const problems = [
     description: `Given a string s, find the length of the longest substring without repeating characters.`,
     difficulty: "Medium",
     acceptanceRate: 33.1,
-    starterCode: "def lengthOfLongestSubstring(s):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def lengthOfLongestSubstring(s):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public int lengthOfLongestSubstring(String s) {\n        // Your code here\n        return 0;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {string} s\n * @return {number}\n */\nfunction lengthOfLongestSubstring(s) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    int lengthOfLongestSubstring(string s) {\n        // Your code here\n        return 0;\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: 's = "abcabcbb"',
@@ -103,7 +160,26 @@ export const problems = [
     description: `Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.`,
     difficulty: "Hard",
     acceptanceRate: 35.8,
-    starterCode: "def findMedianSortedArrays(nums1, nums2):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def findMedianSortedArrays(nums1, nums2):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public double findMedianSortedArrays(int[] nums1, int[] nums2) {\n        // Your code here\n        return 0.0;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {number[]} nums1\n * @param {number[]} nums2\n * @return {number}\n */\nfunction findMedianSortedArrays(nums1, nums2) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {\n        // Your code here\n        return 0.0;\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: "nums1 = [1,3], nums2 = [2]",
@@ -136,7 +212,26 @@ export const problems = [
     description: `Given a string s, return the longest palindromic substring in s.`,
     difficulty: "Medium",
     acceptanceRate: 31.0,
-    starterCode: "def longestPalindrome(s):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def longestPalindrome(s):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public String longestPalindrome(String s) {\n        // Your code here\n        return \"\";\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {string} s\n * @return {string}\n */\nfunction longestPalindrome(s) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    string longestPalindrome(string s) {\n        // Your code here\n        return \"\";\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: 's = "babad"',
@@ -165,7 +260,26 @@ export const problems = [
     description: `Given a signed 32-bit integer x, return x with its digits reversed. If reversing x causes the value to go outside the signed 32-bit integer range [-2³¹, 2³¹ - 1], then return 0.`,
     difficulty: "Medium",
     acceptanceRate: 28.5,
-    starterCode: "def reverse(x):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def reverse(x):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public int reverse(int x) {\n        // Your code here\n        return 0;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {number} x\n * @return {number}\n */\nfunction reverse(x) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    int reverse(int x) {\n        // Your code here\n        return 0;\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: "x = 123",
@@ -196,7 +310,26 @@ export const problems = [
     description: `Given an integer x, return true if x is a palindrome integer. An integer is a palindrome when it reads the same backward as forward. For example, 121 is palindrome while 123 is not.`,
     difficulty: "Easy",
     acceptanceRate: 53.6,
-    starterCode: "def isPalindrome(x):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def isPalindrome(x):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public boolean isPalindrome(int x) {\n        // Your code here\n        return false;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {number} x\n * @return {boolean}\n */\nfunction isPalindrome(x) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    bool isPalindrome(int x) {\n        // Your code here\n        return false;\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: "x = 121",
@@ -226,7 +359,26 @@ export const problems = [
     description: `Given a Roman numeral, convert it to an integer.`,
     difficulty: "Easy",
     acceptanceRate: 58.7,
-    starterCode: "def romanToInt(s):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def romanToInt(s):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public int romanToInt(String s) {\n        // Your code here\n        return 0;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {string} s\n * @return {number}\n */\nfunction romanToInt(s) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    int romanToInt(string s) {\n        // Your code here\n        return 0;\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: 's = "III"',
@@ -262,7 +414,26 @@ export const problems = [
     description: `Write a function to find the longest common prefix string amongst an array of strings. If there is no common prefix, return an empty string "".`,
     difficulty: "Easy",
     acceptanceRate: 39.0,
-    starterCode: "def longestCommonPrefix(strs):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def longestCommonPrefix(strs):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public String longestCommonPrefix(String[] strs) {\n        // Your code here\n        return \"\";\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {string[]} strs\n * @return {string}\n */\nfunction longestCommonPrefix(strs) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    string longestCommonPrefix(vector<string>& strs) {\n        // Your code here\n        return \"\";\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: 'strs = ["flower","flow","flight"]',
@@ -298,7 +469,26 @@ export const problems = [
     \n3. Every close bracket has a corresponding open bracket of the same type.`,
     difficulty: "Easy",
     acceptanceRate: 41.6,
-    starterCode: "def isValid(s):\n    pass",
+    starterCode: {
+      create: [
+        {
+          language: "PYTHON",
+          code: "def isValid(s):\n    pass",
+        },
+        {
+          language: "JAVA",
+          code: "class Solution {\n    public boolean isValid(String s) {\n        // Your code here\n        return false;\n    }\n}",
+        },
+        {
+          language: "JAVASCRIPT",
+          code: "/**\n * @param {string} s\n * @return {boolean}\n */\nfunction isValid(s) {\n    // Your code here\n}",
+        },
+        {
+          language: "CPP",
+          code: "class Solution {\npublic:\n    bool isValid(string s) {\n        // Your code here\n        return false;\n    }\n};",
+        },
+      ],
+    },
     examples: [
       {
         input: 's = "()"',
