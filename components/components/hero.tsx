@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20">
+    <section className="relative overflow-hidden bg-gradient-to-br from-blue-200 via-indigo-200 to-purple-200 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/20">
       <div className="container mx-auto px-4 py-16 sm:py-24">
         <div className="text-center">
           <Badge variant="secondary" className="mb-4">
@@ -14,13 +14,12 @@ export function Hero() {
           </Badge>
 
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-6xl">
-            Master Coding
-            <span className="text-blue-600"> Interviews</span>
+            Forge Your Path with  
+            <span className="text-blue-600"> Mastery</span>
           </h1>
 
           <p className="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Practice coding problems, participate in contests, and prepare for technical interviews with our
-            comprehensive platform trusted by developers worldwide.
+            Practice coding problems, join contests, and ace technical interviews — all in one trusted platform.
           </p>
 
           <div className="mt-10 flex items-center justify-center gap-x-6">

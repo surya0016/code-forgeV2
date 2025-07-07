@@ -77,6 +77,7 @@ export interface Problem {
   id: number
   title: string
   description: string
+  slug: string
   difficulty: "Easy" | "Medium" | "Hard"
   acceptanceRate: number
   createdAt: string

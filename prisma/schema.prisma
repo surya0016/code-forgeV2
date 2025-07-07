@@ -7,6 +7,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id            String   @id // Clerk user ID (string)
+  email         String   @unique
+  firstName     String?
+  lastName      String?
+  username      String?  @unique
+  profileImage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // User preferences
+  preferredLanguage Language @default(PYTHON)
+  theme             String   @default("dark")
+  
+  // User stats
+  totalSubmissions  Int @default(0)
+  solvedProblems    Int @default(0)
+  
+  // Relations
+  submissions   Submission[]
+  discussions   Discussion[]
+  solutions     Solution[]
+  replies       Reply[]
+  votes         Vote[]
+  userProblems  UserProblem[]
+  
+  @@map("users")
+}
+
 model Problem {
   id              Int          @id @default(autoincrement())
   title           String
@@ -16,7 +45,8 @@ model Problem {
   acceptanceRate  Float        @default(0.0)
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
-  isSolved        Boolean      @default(false)
+  
+  // Relations
   starterCodes    StarterCode[]
   testCases       TestCase[]
   submissions     Submission[]
@@ -25,6 +55,25 @@ model Problem {
   solutions       Solution[]
   examples        Examples[]
   constraints     Constraint[]
+  userProblems    UserProblem[]
+  
+  @@map("problems")
+}
+
+// Junction table to track user-problem relationship
+model UserProblem {
+  userId      String
+  problemId   Int
+  isSolved    Boolean  @default(false)
+  attempts    Int      @default(0)
+  lastAttempt DateTime?
+  solvedAt    DateTime?
+  
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem     Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@id([userId, problemId])
+  @@map("user_problems")
 }
 
 model StarterCode {
@@ -35,37 +84,53 @@ model StarterCode {
   problemId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  problem   Problem  @relation(fields: [problemId], references: [id])
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
 
   @@unique([problemId, language])
+  @@map("starter_codes")
 }
 
 model Constraint {
   id        Int     @id @default(autoincrement())
   value     String
   problemId Int
-  problem   Problem @relation(fields: [problemId], references: [id])
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@map("constraints")
 }
 
 model TestCase {
   id        Int     @id @default(autoincrement())
-  input     String
-  output    String
+  input     String  @db.Text
+  output    String  @db.Text
   isHidden  Boolean @default(false)
   problemId Int
-  problem   Problem @relation(fields: [problemId], references: [id])
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@map("test_cases")
 }
 
 model Submission {
   id        Int              @id @default(autoincrement())
-  code      String
-  language  String
+  code      String           @db.Text
+  language  Language
   status    SubmissionStatus
   runtime   Int?
   memory    Float?
   createdAt DateTime         @default(now())
+  
+  // Foreign keys
   problemId Int
-  problem   Problem          @relation(fields: [problemId], references: [id])
+  userId    String
+  
+  // Relations
+  problem   Problem          @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([problemId])
+  @@index([createdAt])
+  @@map("submissions")
 }
 
 model Tag {
@@ -73,47 +138,128 @@ model Tag {
   name        String       @unique
   description String?
   problems    ProblemTag[]
+  
+  @@map("tags")
 }
 
 model ProblemTag {
   problemId Int
   tagId     Int
-  problem   Problem @relation(fields: [problemId], references: [id])
-  tag       Tag     @relation(fields: [tagId], references: [id])
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   @@id([problemId, tagId])
+  @@map("problem_tags")
 }
 
 model Discussion {
   id        Int      @id @default(autoincrement())
   title     String
-  content   String
+  content   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   upvotes   Int      @default(0)
+  downvotes Int      @default(0)
   isPinned  Boolean  @default(false)
+  
+  // Foreign keys
   problemId Int
-  problem   Problem  @relation(fields: [problemId], references: [id])
+  userId    String
+  
+  // Relations
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies   Reply[]
+  votes     Vote[]
+  
+  @@index([userId])
+  @@index([problemId])
+  @@map("discussions")
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  upvotes   Int      @default(0)
+  downvotes Int      @default(0)
+  
+  // Foreign keys
+  discussionId Int
+  userId       String
+  parentId     Int?     // For nested replies
+  
+  // Relations
+  discussion   Discussion @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent       Reply?     @relation("ReplyToReply", fields: [parentId], references: [id])
+  children     Reply[]    @relation("ReplyToReply")
+  votes        Vote[]
+  
+  @@index([userId])
+  @@index([discussionId])
+  @@map("replies")
+}
+
+model Vote {
+  id           Int      @id @default(autoincrement())
+  voteType     VoteType
+  createdAt    DateTime @default(now())
+  
+  // Foreign keys
+  userId       String
+  discussionId Int?
+  replyId      Int?
+  solutionId   Int?
+  
+  // Relations
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discussion   Discussion? @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+  reply        Reply?      @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  solution     Solution?   @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  
+  // Ensure user can only vote once per item
+  @@unique([userId, discussionId])
+  @@unique([userId, replyId])
+  @@unique([userId, solutionId])
+  @@index([userId])
+  @@map("votes")
 }
 
 model Solution {
   id        Int      @id @default(autoincrement())
   title     String
-  content   String
+  content   String   @db.Text
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   upvotes   Int      @default(0)
-  language  String?
+  downvotes Int      @default(0)
+  language  Language?
+  
+  // Foreign keys
   problemId Int
-  problem   Problem  @relation(fields: [problemId], references: [id])
+  userId    String
+  
+  // Relations
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  votes     Vote[]
+  
+  @@index([userId])
+  @@index([problemId])
+  @@map("solutions")
 }
 
 model Examples {
   id          Int     @id @default(autoincrement())
-  input       String
-  output      String
-  explanation String?
+  input       String  @db.Text
+  output      String  @db.Text
+  explanation String? @db.Text
   problemId   Int
-  Problem     Problem @relation(fields: [problemId], references: [id])
+  Problem     Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  
+  @@map("examples")
 }
 
 enum Language {
@@ -135,4 +281,9 @@ enum SubmissionStatus {
   TimeLimitExceeded
   RuntimeError
   CompileError
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
 }

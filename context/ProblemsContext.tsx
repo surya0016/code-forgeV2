@@ -13,6 +13,7 @@ interface ProblemsContextType {
   refreshProblems: () => Promise<void>
   getProblemById: (id: number) => Problem | undefined
   getFilteredProblems: (filters: ProblemFilters) => Problem[]
+  getSortedProblems: (problems: Problem[], sortBy: SortOption, order: SortOrder) => Problem[]
 }
 
 interface ProblemFilters {
@@ -20,7 +21,12 @@ interface ProblemFilters {
   difficulty?: "all" | "Easy" | "Medium" | "Hard"
   status?: "all" | "solved" | "unsolved"
   tags?: string[]
+  sortBy?: SortOption
+  sortOrder?: SortOrder
 }
+
+type SortOption = "title" | "difficulty" | "acceptance" | "id" | "createdAt"
+type SortOrder = "asc" | "desc"
 
 // Create context
 const ProblemsContext = createContext<ProblemsContextType | null>(null)
@@ -71,8 +77,39 @@ export function ProblemsProvider({ children }: { children: ReactNode }) {
     return problems.find(problem => problem.id === id)
   }
 
+  const getSortedProblems = (problems: Problem[], sortBy: SortOption, order: SortOrder): Problem[] => {
+    const sortedProblems = [...problems].sort((a, b) => {
+      let comparison = 0
+      
+      switch (sortBy) {
+        case "title":
+          comparison = a.title.localeCompare(b.title)
+          break
+        case "difficulty":
+          const difficultyOrder = { "Easy": 1, "Medium": 2, "Hard": 3 }
+          comparison = difficultyOrder[a.difficulty] - difficultyOrder[b.difficulty]
+          break
+        case "acceptance":
+          comparison = a.acceptanceRate - b.acceptanceRate
+          break
+        case "id":
+          comparison = a.id - b.id
+          break
+        case "createdAt":
+          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          break
+        default:
+          comparison = 0
+      }
+      
+      return order === "asc" ? comparison : -comparison
+    })
+    
+    return sortedProblems
+  }
+
   const getFilteredProblems = (filters: ProblemFilters): Problem[] => {
-    return problems.filter(problem => {
+    let filteredProblems = problems.filter(problem => {
       // Search filter
       if (filters.search) {
         const searchLower = filters.search.toLowerCase()
@@ -102,6 +139,13 @@ export function ProblemsProvider({ children }: { children: ReactNode }) {
 
       return true
     })
+
+    // Apply sorting if specified
+    if (filters.sortBy && filters.sortOrder) {
+      filteredProblems = getSortedProblems(filteredProblems, filters.sortBy, filters.sortOrder)
+    }
+
+    return filteredProblems
   }
 
   // Fetch problems on mount
@@ -116,7 +160,8 @@ export function ProblemsProvider({ children }: { children: ReactNode }) {
     fetchProblems,
     refreshProblems,
     getProblemById,
-    getFilteredProblems
+    getFilteredProblems,
+    getSortedProblems
   }
 
   return (
@@ -145,3 +190,30 @@ export const useFilteredProblems = (filters: ProblemFilters) => {
   const { getFilteredProblems } = useProblems()
   return getFilteredProblems(filters)
 }
+
+// Hook for sorting problems
+export const useSortedProblems = (problems: Problem[], sortBy: SortOption, order: SortOrder) => {
+  const { getSortedProblems } = useProblems()
+  return getSortedProblems(problems, sortBy, order)
+}
+
+// Hook for getting all available sort options
+export const useSortOptions = () => {
+  const sortOptions: { value: SortOption; label: string }[] = [
+    { value: "id", label: "Problem Number" },
+    { value: "title", label: "Title" },
+    { value: "difficulty", label: "Difficulty" },
+    { value: "acceptance", label: "Acceptance Rate" },
+    { value: "createdAt", label: "Date Added" }
+  ]
+
+  const sortOrders: { value: SortOrder; label: string }[] = [
+    { value: "asc", label: "Ascending" },
+    { value: "desc", label: "Descending" }
+  ]
+
+  return { sortOptions, sortOrders }
+}
+
+// Export types for use in other components
+export type { ProblemFilters, SortOption, SortOrder }

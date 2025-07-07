@@ -24,7 +24,7 @@ const getProblems = async (): Promise<Problem[]> => {
         createdAt: "desc",
       },
       take: 10,
-    });
+    }); 
     
     // Serialize Date fields to string for each problem
     const serializeDates = (obj: any) => {
