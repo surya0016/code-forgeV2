@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
-import axios from "axios";
 
 export async function POST(req: Request) {
   try {
@@ -84,12 +83,12 @@ export async function POST(req: Request) {
     });
 
     // Update problem acceptance rate with correct enum value
-    const acceptedSubmissions = await prisma.submission.count({
-      where: { 
-        problemId,
-        status: "Accepted", // Match the exact enum value
-      },
-    });
+    // const acceptedSubmissions = await prisma.submission.count({
+    //   where: { 
+    //     problemId,
+    //     status: "Accepted", // Match the exact enum value
+    //   },
+    // });
 
     // Rest of your code...
 

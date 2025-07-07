@@ -2,6 +2,47 @@
 
 import prisma from "@/lib/prisma";
 import { Problem, ProblemSummary } from "@/lib/types";
+import { Language } from "@prisma/client"; // Import the Language enum
+
+// Define a recursive type for serializable objects
+type SerializableValue = 
+  | string 
+  | number 
+  | boolean 
+  | null 
+  | undefined 
+  | Date
+  | { [key: string]: SerializableValue }
+  | SerializableValue[];
+
+// Create a reusable serializeDates function
+const serializeDates = (obj: SerializableValue): SerializableValue => {
+  if (!obj || typeof obj !== "object") return obj;
+  
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(serializeDates);
+  }
+  
+  const newObj: { [key: string]: SerializableValue } = {};
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+      if (value instanceof Date) {
+        newObj[key] = value.toISOString();
+      } else if (typeof value === "object") {
+        newObj[key] = serializeDates(value);
+      } else {
+        newObj[key] = value;
+      }
+    }
+  }
+  
+  return newObj;
+};
 
 const getProblems = async (): Promise<Problem[]> => {
   try {
@@ -26,23 +67,7 @@ const getProblems = async (): Promise<Problem[]> => {
       take: 10,
     });
     
-    // Serialize Date fields to string for each problem
-    const serializeDates = (obj: any) => {
-      if (!obj || typeof obj !== "object") return obj;
-      const newObj: any = Array.isArray(obj) ? [] : {};
-      for (const key in obj) {
-        if (obj[key] instanceof Date) {
-          newObj[key] = obj[key].toISOString();
-        } else if (typeof obj[key] === "object") {
-          newObj[key] = serializeDates(obj[key]);
-        } else {
-          newObj[key] = obj[key];
-        }
-      }
-      return newObj;
-    };
-
-    return problems.map(serializeDates) as Problem[];
+    return problems.map(problem => serializeDates(problem) as unknown as Problem);
     
   } catch (error) {
     console.error("Error fetching problems:", error);
@@ -72,24 +97,7 @@ const getProblemById = async (id: number): Promise<Problem | null> => {
     });
     
     if (!problem) return null;
-
-    // Convert Date fields to string
-    const serializeDates = (obj: any) => {
-      if (!obj || typeof obj !== "object") return obj;
-      const newObj: any = Array.isArray(obj) ? [] : {};
-      for (const key in obj) {
-        if (obj[key] instanceof Date) {
-          newObj[key] = obj[key].toISOString();
-        } else if (typeof obj[key] === "object") {
-          newObj[key] = serializeDates(obj[key]);
-        } else {
-          newObj[key] = obj[key];
-        }
-      }
-      return newObj;
-    };
-
-    return serializeDates(problem) as Problem;
+    return serializeDates(problem) as unknown as Problem;
     
   } catch (error) {
     console.error("Error fetching problem:", error);
@@ -119,24 +127,7 @@ const getProblemBySlug = async (slug: string): Promise<Problem | null> => {
     });
     
     if (!problem) return null;
-
-    // Convert Date fields to string
-    const serializeDates = (obj: any) => {
-      if (!obj || typeof obj !== "object") return obj;
-      const newObj: any = Array.isArray(obj) ? [] : {};
-      for (const key in obj) {
-        if (obj[key] instanceof Date) {
-          newObj[key] = obj[key].toISOString();
-        } else if (typeof obj[key] === "object") {
-          newObj[key] = serializeDates(obj[key]);
-        } else {
-          newObj[key] = obj[key];
-        }
-      }
-      return newObj;
-    };
-
-    return serializeDates(problem) as Problem;
+    return serializeDates(problem) as unknown as Problem;
     
   } catch (error) {
     console.error("Error fetching problem by slug:", error);
@@ -191,7 +182,7 @@ const getStarterCode = async (problemId: number, language: string): Promise<{ co
       where: {
         problemId_language: {
           problemId,
-          language: language as any, // Cast to Language enum
+          language: language as Language, // Cast to Language enum
         },
       },
       select: {
@@ -221,7 +212,7 @@ const getStarterCodeBySlug = async (slug: string, language: string): Promise<{ c
       where: {
         problemId_language: {
           problemId: problem.id,
-          language: language as any, // Cast to Language enum
+          language: language as Language, // Cast to Language enum
         },
       },
       select: {

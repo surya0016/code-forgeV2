@@ -3,6 +3,27 @@ import { NextResponse } from 'next/server'
 import { Webhook } from 'svix'
 import prisma from '@/lib/prisma'
 
+// Define interfaces for Clerk webhook data
+interface ClerkEmailAddress {
+  email_address: string;
+  id: string;
+}
+
+interface ClerkUserData {
+  id: string;
+  email_addresses?: ClerkEmailAddress[];
+  first_name?: string | null;
+  last_name?: string | null;
+  username?: string | null;
+  image_url?: string | null;
+}
+
+interface ClerkEvent {
+  data: ClerkUserData;
+  object: string;
+  type: string;
+}
+
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET
 
 export async function POST(req: Request) {
@@ -29,14 +50,14 @@ export async function POST(req: Request) {
   // Create a new Svix instance with your webhook secret
   const wh = new Webhook(webhookSecret)
 
-  let evt: any
+  let evt: ClerkEvent
 
   try {
     evt = wh.verify(body, {
       'svix-id': svix_id,
       'svix-timestamp': svix_timestamp,
       'svix-signature': svix_signature,
-    }) as any
+    }) as ClerkEvent
   } catch (err) {
     console.error('Error verifying webhook:', err)
     return new Response('Error occured', {
@@ -73,7 +94,7 @@ export async function POST(req: Request) {
   }
 }
 
-async function handleUserCreated(userData: any) {
+async function handleUserCreated(userData: ClerkUserData) {
   console.log('Creating user:', userData);
   
   try {
@@ -106,7 +127,7 @@ async function handleUserCreated(userData: any) {
   }
 }
 
-async function handleUserUpdated(userData: any) {
+async function handleUserUpdated(userData: ClerkUserData) {
   console.log('Updating user:', userData)
   
   try {
@@ -129,7 +150,7 @@ async function handleUserUpdated(userData: any) {
   }
 }
 
-async function handleUserDeleted(userData: any) {
+async function handleUserDeleted(userData: ClerkUserData) {
   console.log('Deleting user:', userData)
   
   try {
