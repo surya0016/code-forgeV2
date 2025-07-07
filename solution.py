@@ -1,5 +1,5 @@
 # Valid Parentheses
-def isValid(s):
+def isValid(s: str) -> bool:
     stack = []
     mapping = {")": "(", "}": "{", "]": "["}
     for char in s:
@@ -12,7 +12,7 @@ def isValid(s):
     return not stack
 
 # Longest Common Prefix
-def longestCommonPrefix(strs):
+def longestCommonPrefix(strs: list[str]) -> str:
     if not strs:
         return ""
     
@@ -25,7 +25,7 @@ def longestCommonPrefix(strs):
     return prefix
 
 # Roman to Integer
-def romanToInt(s):
+def romanToInt(s: str) -> int:
     roman_map = {'I': 1, 'V': 5, 'X': 10, 'L': 50, 'C': 100, 'D': 500, 'M': 1000}
     total = 0
     i = 0
@@ -39,7 +39,7 @@ def romanToInt(s):
     return total
 
 # Palindrome Number
-def isPalindrome(x):
+def isPalindrome(x: int) -> bool:
     if x < 0:
         return False
     original = x
@@ -50,7 +50,7 @@ def isPalindrome(x):
     return original == reversed_x
 
 # Reverse Integer
-def reverse(x):
+def reverse(x: int) -> int:
     sign = -1 if x < 0 else 1
     x = abs(x)
     reversed_x = 0
@@ -64,7 +64,7 @@ def reverse(x):
     return result
 
 # Longest Palindromic Substring
-def longestPalindrome(s):
+def longestPalindrome(s: str) -> str:
     if not s:
         return ""
 
@@ -96,7 +96,7 @@ def longestPalindrome(s):
     return s[start : start + max_len]
 
 # Median of Two Sorted Arrays
-def findMedianSortedArrays(nums1, nums2):
+def findMedianSortedArrays(nums1: list[int], nums2: list[int]) -> float:
     merged = []
     i, j = 0, 0
     while i < len(nums1) and j < len(nums2):
@@ -118,7 +118,7 @@ def findMedianSortedArrays(nums1, nums2):
         return (float(mid1) + float(mid2)) / 2.0
 
 # Longest Substring Without Repeating Characters
-def lengthOfLongestSubstring(s):
+def lengthOfLongestSubstring(s: str) -> int:
     char_set = set()
     left = 0
     max_len = 0
@@ -136,7 +136,7 @@ class ListNode:
         self.val = val
         self.next = next
 
-def addTwoNumbers(l1, l2):
+def addTwoNumbers(l1: ListNode, l2: ListNode) -> ListNode:
     dummy_head = ListNode(0)
     current = dummy_head
     carry = 0
@@ -160,7 +160,7 @@ def addTwoNumbers(l1, l2):
     return dummy_head.next
 
 # Two Sum (assuming the most common version: return indices)
-def twoSum(nums, target):
+def twoSum(nums: list[int], target: int) -> list[int]:
     num_map = {}
     for i, num in enumerate(nums):
         complement = target - num
