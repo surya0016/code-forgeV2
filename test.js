@@ -28,3 +28,13 @@ console.log(james)
 "Longest Substring Without Repeating Characters" 
 "Add Two Numbers" 
 "Two Sum"
+
+empData = ([{
+  empName: "surya",
+  designation: "Manager",
+  salary: 20000,
+},{
+  empName: "surya",
+  designation: "Manager",
+  salary: 20000,
+}]);
