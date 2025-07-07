@@ -5,6 +5,19 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+
+export const formatMemory = (memoryKB: number | null) => {
+  if (memoryKB === null) return "N/A"
+  if (memoryKB < 1024) return `${memoryKB} KB`
+  return `${(memoryKB / 1024).toFixed(1)} MB`
+}
+
+export const formatRuntime = (runtimeMs: number | null) => {
+  if (runtimeMs === null) return "N/A"
+  return `${runtimeMs} ms`
+}
+
+
 export const problems = [
   {
     title: "Two Sum",

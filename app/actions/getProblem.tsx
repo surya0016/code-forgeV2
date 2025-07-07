@@ -24,7 +24,7 @@ const getProblems = async (): Promise<Problem[]> => {
         createdAt: "desc",
       },
       take: 10,
-    }); 
+    });
     
     // Serialize Date fields to string for each problem
     const serializeDates = (obj: any) => {
@@ -154,7 +154,6 @@ const getProblemsSummary = async (): Promise<ProblemSummary[]> => {
         slug: true,
         difficulty: true,
         acceptanceRate: true,
-        isSolved: true,
         tags: {
           include: {
             tag: true
@@ -169,6 +168,7 @@ const getProblemsSummary = async (): Promise<ProblemSummary[]> => {
     // Map tags to ensure tag.description is always a string
     return problems.map((problem) => ({
       ...problem,
+      isSolved: false, // Default value; replace with actual logic if available
       tags: problem.tags.map((tagObj) => ({
         ...tagObj,
         tag: {

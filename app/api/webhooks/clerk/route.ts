@@ -74,9 +74,20 @@ export async function POST(req: Request) {
 }
 
 async function handleUserCreated(userData: any) {
-  console.log('Creating user:', userData)
+  console.log('Creating user:', userData);
   
   try {
+    // First check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userData.id }
+    });
+    
+    if (existingUser) {
+      console.log('User already exists, updating:', userData.id);
+      return await handleUserUpdated(userData);
+    }
+    
+    // If user doesn't exist, create them
     const user = await prisma.user.create({
       data: {
         id: userData.id,
@@ -85,18 +96,13 @@ async function handleUserCreated(userData: any) {
         lastName: userData.last_name || null,
         username: userData.username || null,
         profileImage: userData.image_url || null,
-        // Default preferences
-        preferredLanguage: 'PYTHON',
-        theme: 'dark',
-        totalSubmissions: 0,
-        solvedProblems: 0,
       },
-    })
+    });
     
-    console.log('User created successfully:', user)
+    console.log('User created successfully:', user);
   } catch (error) {
-    console.error('Error creating user:', error)
-    throw error
+    console.error('Error creating user:', error);
+    throw error;
   }
 }
 

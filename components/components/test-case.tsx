@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, XCircle, Clock, MemoryStickIcon as Memory, AlertCircle } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { formatMemory, formatRuntime } from "@/lib/utils"
 
 interface ExecutionResult {
   input: string
@@ -70,17 +71,6 @@ export function TestResults({ results, summary }: TestResultsProps) {
       "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
   }
 
-  const formatMemory = (memoryKB: number | null) => {
-    if (memoryKB === null) return "N/A"
-    if (memoryKB < 1024) return `${memoryKB} KB`
-    return `${(memoryKB / 1024).toFixed(1)} MB`
-  }
-
-  const formatRuntime = (runtimeMs: number | null) => {
-    if (runtimeMs === null) return "N/A"
-    return `${runtimeMs} ms`
-  }
-
   const overallPassed = summary.failedTests === 0 && results.every(r => r.exitCode === 0 || r.exitCode === null)
   const hasRuntimeErrors = results.some(r => r.exitCode !== 0 && r.exitCode !== null)
 
@@ -105,25 +95,7 @@ export function TestResults({ results, summary }: TestResultsProps) {
         </div>
       </div>
 
-      {/* Summary Statistics */}
-      {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
-          <div className="font-semibold text-lg">{summary.passedTests}/{summary.totalTests}</div>
-          <div className="text-muted-foreground">Test Cases</div>
-        </div>
-        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
-          <div className="font-semibold text-lg">{formatRuntime(summary.averageRuntime)}</div>
-          <div className="text-muted-foreground">Avg Runtime</div>
-        </div>
-        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
-          <div className="font-semibold text-lg">{formatRuntime(summary.totalRuntime)}</div>
-          <div className="text-muted-foreground">Total Runtime</div>
-        </div>
-        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
-          <div className="font-semibold text-lg">{formatMemory(summary.maxMemory)}</div>
-          <div className="text-muted-foreground">Peak Memory</div>
-        </div>
-      </div> */}
+      
       <div className="">
         <Tabs defaultValue={"test-0"}>
           <div className="space-y-2">

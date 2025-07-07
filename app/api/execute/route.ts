@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { problems } from '@/lib/utils'
+import prisma from '@/lib/prisma'
 
 export async function POST(req: Request) {
   try {
@@ -32,14 +32,20 @@ export async function POST(req: Request) {
 
     console.log('Validation passed, looking for problem:', problemSlug) // Debug log
 
-    // Find the problem and get the wrapper
-    const problem = problems.find(p => p.slug === problemSlug)
+    // Get problem from database instead of importing from utils
+    const problem = await prisma.problem.findUnique({
+      where: { slug: problemSlug },
+      include: {
+        starterCodes: true
+      }
+    })
+
     if (!problem) {
       console.log('Problem not found:', problemSlug) // Debug log
       return NextResponse.json({ error: 'Problem not found' }, { status: 404 })
     }
 
-    const starterCode = problem.starterCode.create.find(sc => sc.language === language)
+    const starterCode = problem.starterCodes.find(sc => sc.language === language)
     if (!starterCode?.wrapper) {
       console.log('Wrapper not found for language:', language) // Debug log
       return NextResponse.json({ error: 'Wrapper not found for this language' }, { status: 404 })

@@ -21,19 +21,26 @@ import Loading from "./loading"
 import { ExecutionResult, TestResultsSummary } from "@/lib/types"
 import axios from "axios"
 import { TestResults } from "./test-case"
+import ProblemDetailSkeleton from "../skeletons/problem-detail-skeleton"
+import { useUser } from "@clerk/nextjs"
+import { CheckCircle, XCircle, Copy, Code as LucideCode } from "lucide-react"
+import { formatRuntime, formatMemory } from "@/lib/utils"
 
 type Languages = "PYTHON" | "JAVASCRIPT" | "JAVA" | "CPP"
 
 export function ProblemDetail({ problemId }: { problemId: number }) {
+  const { isSignedIn, user, isLoaded } = useUser()
   const [selectedLanguage, setSelectedLanguage] = useState<Languages>("PYTHON")
   const [loadingCode, setLoadingCode] = useState(false)
+  const [loadingSubmit, setLoadingSubmit] = useState(false)
   const [showResults, setShowResults] = useState(false)
+  const [submissionResult, setSubmissionResult] = useState<any>(null)
 
   const [testResults, setTestResults] = useState<{
     results: ExecutionResult[],
     summary: TestResultsSummary
   } | null>(null) 
-
+  
   const { theme, setTheme } = useTheme()
   const {
     problems,
@@ -139,6 +146,50 @@ export function ProblemDetail({ problemId }: { problemId: number }) {
     }
   }
 
+  // Add submitCode function
+  const submitCode = async () => {
+    if (!isSignedIn) {
+      return;
+    }
+    
+    // If we haven't run the code yet, run it first
+    if (!testResults) {
+      await runCode();
+      // Wait a bit for testResults to be set
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    setLoadingSubmit(true);
+    
+    try {
+      const response = await axios.post('/api/submit', {
+        code,
+        language: selectedLanguage,
+        problemId,
+        // Pass the existing test results instead of re-running
+        executionResult: {
+          results: testResults?.results || [],
+          summary: testResults?.summary || {
+            totalTests: 0,
+            passedTests: 0,
+            failedTests: 0,
+            totalRuntime: 0,
+            maxMemory: 0,
+            averageRuntime: 0
+          }
+        }
+      });
+
+      setSubmissionResult(response.data);
+      setShowResults(true);
+
+    } catch (error) {
+      console.error('Error submitting code:', error);
+    } finally {
+      setLoadingSubmit(false);
+    }
+  }
+
   // Update code when language changes
   useEffect(() => {
     if (selectedLanguage && problem && problem.starterCodes) {
@@ -156,9 +207,7 @@ export function ProblemDetail({ problemId }: { problemId: number }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-200 w-full">
-        <Loading/>
-      </div>
+      <ProblemDetailSkeleton/>
     )
   }
 
@@ -271,7 +320,126 @@ export function ProblemDetail({ problemId }: { problemId: number }) {
                 </TabsContent>
 
                 <TabsContent value="submissions">
-                  <div className="text-center py-8 text-muted-foreground">Submission history will appear here</div>
+                  {!submissionResult ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No submissions yet. Submit your code to see results here.
+                    </div>
+                  ) : (
+                    <div className="space-y-6 p-4">
+                      {/* Submission Status */}
+                      <div className={`p-4 rounded-lg border-l-4 ${
+                        submissionResult.allTestsPassed 
+                          ? "bg-green-50 border-green-500 dark:bg-green-900/20 dark:border-green-700" 
+                          : "bg-red-50 border-red-500 dark:bg-red-900/20 dark:border-red-700"
+                      }`}>
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-lg font-semibold flex items-center gap-2">
+                            {submissionResult.allTestsPassed 
+                              ? <span className="flex items-center text-green-700 dark:text-green-400">
+                                  <CheckCircle className="w-5 h-5 mr-1" /> Accepted
+                                </span>
+                              : <span className="flex items-center text-red-700 dark:text-red-400">
+                                  <XCircle className="w-5 h-5 mr-1" /> Wrong Answer
+                                </span>
+                            }
+                          </h3>
+                          <div className="text-sm text-muted-foreground">
+                            Submitted {new Date(submissionResult.submission.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Statistics */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
+                          <div className="font-semibold text-lg">
+                            {submissionResult.summary.passedTests}/{submissionResult.summary.totalTests}
+                          </div>
+                          <div className="text-muted-foreground">Test Cases</div>
+                        </div>
+                        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
+                          <div className="font-semibold text-lg">
+                            {formatRuntime(submissionResult.summary.averageRuntime)}
+                          </div>
+                          <div className="text-muted-foreground">Avg Runtime</div>
+                        </div>
+                        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
+                          <div className="font-semibold text-lg">
+                            {formatRuntime(submissionResult.summary.totalRuntime)}
+                          </div>
+                          <div className="text-muted-foreground">Total Runtime</div>
+                        </div>
+                        <div className="text-center dark:bg-slate-100/10 bg-slate-900/15 py-4 border rounded-md">
+                          <div className="font-semibold text-lg">
+                            {formatMemory(submissionResult.summary.maxMemory)}
+                          </div>
+                          <div className="text-muted-foreground">Peak Memory</div>
+                        </div>
+                      </div>
+
+                      {/* Submitted Code */}
+                      <div>
+                        <h3 className="text-sm font-medium mb-2 flex items-center">
+                          <Code className="w-4 h-4 mr-2" /> Submitted Code ({submissionResult.submission.language})
+                        </h3>
+                        <div className="relative">
+                          <div className="absolute top-2 right-2">
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => {
+                              navigator.clipboard.writeText(submissionResult.submission.code);
+                            }}>
+                              <Copy className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                          <pre className="bg-slate-100 dark:bg-slate-900 p-4 rounded-md overflow-x-auto text-sm">
+                            <code>{submissionResult.submission.code}</code>
+                          </pre>
+                        </div>
+                      </div>
+
+                      {/* Recent Submissions Table - If you have multiple submissions */}
+                      <div className="mt-8">
+                        <h3 className="text-sm font-medium mb-2">Recent Submissions</h3>
+                        <div className="overflow-x-auto">
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="border-b text-left text-xs text-muted-foreground">
+                                <th className="px-4 py-2">Status</th>
+                                <th className="px-4 py-2">Runtime</th>
+                                <th className="px-4 py-2">Memory</th>
+                                <th className="px-4 py-2">Language</th>
+                                <th className="px-4 py-2 text-right">Timestamp</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr className="border-b hover:bg-muted/50">
+                                <td className="px-4 py-2">
+                                  <span className={`inline-block rounded-full px-2 py-1 text-xs ${
+                                    submissionResult.allTestsPassed
+                                      ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300"
+                                      : "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
+                                  }`}>
+                                    {submissionResult.submission.status}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-2 text-sm">
+                                  {formatRuntime(submissionResult.submission.runtime)}
+                                </td>
+                                <td className="px-4 py-2 text-sm">
+                                  {formatMemory(submissionResult.submission.memory)}
+                                </td>
+                                <td className="px-4 py-2 text-sm">
+                                  {submissionResult.submission.language}
+                                </td>
+                                <td className="px-4 py-2 text-xs text-right">
+                                  {new Date(submissionResult.submission.createdAt).toLocaleString()}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </TabsContent>
 
                 <TabsContent value="discuss">
@@ -307,14 +475,18 @@ export function ProblemDetail({ problemId }: { problemId: number }) {
                       <Button  
                         onClick={runCode} 
                         variant="outline"
-                        disabled={loadingCode || !problem?.slug}
+                        disabled={loadingCode || loadingSubmit || !problem?.slug}
                       >
                         <Play className="h-4 w-4 mr-2" />
                         {loadingCode ? "Running..." : "Run Code"}
                       </Button>
-                      <Button onClick={()=>console.log("")}>
+                      <Button 
+                        onClick={submitCode}
+                        disabled={loadingCode || loadingSubmit || !isSignedIn}
+                        className={submissionResult?.allTestsPassed ? "bg-green-600 hover:bg-green-700" : ""}
+                      >
                         <Send className="h-4 w-4 mr-2" />
-                        Submit
+                        {!isSignedIn ? "Sign in to Submit" : loadingSubmit ? "Submitting..." : "Submit"}
                       </Button>
                     </div>
                   </div>

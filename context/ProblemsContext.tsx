@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
 import axios from "axios"
 import { Problem, ProblemsResponse, ProblemSummary } from "@/lib/types"
+import { useUser } from "@clerk/nextjs"
 
 // Context types
 interface ProblemsContextType {
@@ -36,6 +37,7 @@ export function ProblemsProvider({ children }: { children: ReactNode }) {
   const [problems, setProblems] = useState<Problem[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { isSignedIn, user } = useUser()
 
   const fetchProblems = async () => {
     if (loading) return // Prevent multiple simultaneous requests
@@ -60,6 +62,26 @@ export function ProblemsProvider({ children }: { children: ReactNode }) {
       }))
       
       setProblems(transformedProblems)
+
+      // If user is signed in, fetch their solved problems
+      if (isSignedIn && user?.id) {
+        try {
+          const userProblemsResponse = await axios.get('/api/user/problems')
+          const userProblems = userProblemsResponse.data
+          
+          // Update problems with user's solved status
+          setProblems(prevProblems => 
+            prevProblems.map(problem => ({
+              ...problem,
+              isSolved: userProblems.some((up: any) => 
+                up.problemId === problem.id && up.isSolved
+              )
+            }))
+          )
+        } catch (error) {
+          console.error("Error fetching user problems:", error)
+        }
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch problems"
       setError(errorMessage)

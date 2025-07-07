@@ -23,7 +23,7 @@ export async function GET(){
       },
       take: 10,
     });
-
+    
     return NextResponse.json({
       problems
     })
